@@ -4,6 +4,8 @@
 
 .button {
     width: 10vw;
+    max-width: 100px;
+    max-height: 100px;
     height: 10vw;
     padding: 0;
     border-width:0;
@@ -16,8 +18,10 @@
 
 .pantallaOperaciones, .pantallaResultado
 {
-    min-height: 8vw;
+    height: 8vw;
     width: 40vw;
+    max-width: 400px;
+    max-height: 80px;
     background-color: black;
     color: white;
     font-weight: 800;
@@ -29,6 +33,7 @@
 .calculadora {
     width: 40vw;
     box-shadow: 0 0 7px 0 gray;
+    max-width: 400px;
 }
 
 body {
@@ -39,6 +44,8 @@ body {
 
 .equals{
     width: 20vw;
+    max-width: 200px;
+    max-height: 100px;
     background-color: rgb(248, 147, 45);
 }
 
@@ -47,29 +54,33 @@ body {
 }
 
 #C {
-    width: 20vw !important;
+    width: 20vw;
+    max-width: 200px;
 }
 
 .espacioHistorico, .historicoContenedor {
     width: 40vw;
-    height: 4vw;
+    max-width: 400px;
+    height: 1.5vw;
+    max-height: 25px;
 }
 
 .historico{
     background-color: indianred;
     position: fixed;
-    top: 16vw;
     width: 40vw;
-    height: 4vw;
+    max-width: 400px;
+    height: 1.5vw;
+    max-height: 525px;
     -webkit-transition: all 0.6s ease;
     z-index: 10;
-    margin-top:8px;
     font-size: 0;
 }
 
 .historico:hover{
     height: 54vw;
     font-size: 1.3em;
+    overflow: scroll
 }
 
 .pantallas {
