@@ -1,12 +1,219 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class PantallaOperaciones extends React.Component {
+    render(){
+        return <p className='pantallaOperaciones'>{this.props.operacion}</p>
+    }
+}
+class PantallaResultado extends React.Component {
+    render(){
+        return <p className='pantallaResultado'>{this.props.resultado}</p>
+    }
+}
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+function Tecla (props) {
+        return <button type='button' onClick={props.onClick} id={props.id} className={'button '+props.tipo}>{props.id}</button>
+}
+
+class Calculadora extends React.Component {
+    
+    constructor(props){
+        super(props);
+        this.state = {
+            operacion: '',
+            resultadoMostrar: 0,
+            resultadoIntermedio: 0,
+            ultimoOperador:'',
+            ultimoCaracter:'',
+            ultimoNumero:'',
+            operadores:[],
+            numeros:[]
+        }
+    }
+
+    renderButton(i,operator){
+        let tipo = (operator !== undefined && operator === true) ? 'operator' : 'number';
+        if(i==='='){
+            tipo = tipo.concat(' equals');
+        }else if(i==='÷'){
+            i = '/';
+        }
+        return <Tecla id={i} tipo={tipo} onClick={()=>this.handleClick(i)}></Tecla>
+    }
+
+    handleClick(i){
+        console.log(i)
+
+        if(i==='C'){
+            this.resetCalculator()
+            return;
+        
+        }else if(i==='=' && this.state.ultimoCaracter==='='){
+            return
+
+        // Si se introduce un operador y no hay nada
+        }else if(this.state.operacion==="" && this.isOperator(i)){
+
+        // Si se introduce un operador, y el ultimo caracter es un numero
+        }else if(this.isOperator(i) && (!this.isOperator(this.state.ultimoCaracter)
+                    || this.state.ultimoCaracter==='=')){
+                        
+            this.setState({operacion:this.state.operacion+i});
+            this.addNumber();
+            this.addOperator(i);
+
+            if(i==='='){
+                this.resultadoFinal()
+            }
+
+            if(this.state.resultadoMostrar!==0)this.setState({resultadoIntermedio:this.state.resultadoMostrar})
+            
+            
+        // Si se introduce un operador, y el ultimo caracter es un operador (se sobreescribe)
+        }else if(this.isOperator(this.state.ultimoCaracter) && this.isOperator(i) 
+                && this.state.ultimoCaracter!=='='){
+                    
+            this.setState({operacion:this.state.operacion.replace(/.$/,i)});
+            this.changeOperator(i);
+
+        // Si se introduce un numero
+        }else if(!this.isOperator(i)){
+            console.log('se introduce parte de un numero')
+            let ultimoNumeroAux = this.state.ultimoNumero+i
+            this.setState({operacion:this.state.operacion+i});
+            this.setState({ultimoNumero: ultimoNumeroAux})
+
+            // Si se introducuce un numero despues de un operador (salvo el -)
+            if(this.state.numeros.length>0 && this.state.operadores.length>0 && !this.isOperator(i) && i!=='.'){
+                let res = this.doOperation(this.state.resultadoIntermedio,ultimoNumeroAux,this.state.operadores[this.state.operadores.length-1])
+                console.log(res)
+                this.setState({ultimoResultado:res})
+                this.setState({resultadoMostrar:res})
+            }
+        }
+        
+        if(this.state.numeros.length===1 && this.state.resultadoIntermedio===0){
+            this.setState({resultadoIntermedio:this.state.numeros[0]})
+        }
+        
+        this.setState({ultimoCaracter:i})
+    }
+
+    isOperator(char){
+        return (char==='+' || char==='-' || char==='/' || char==='x' || char==='=' || char==='%' 
+                || char === '()')
+    }
+
+    doOperation(ultimoResultado,numeroNuevo,operador){
+        console.log(ultimoResultado + '  ' + numeroNuevo + '  ' + operador)
+        
+        switch(operador){
+            case '+':
+                return parseFloat(ultimoResultado) + parseFloat(numeroNuevo);
+            case '-':
+                return parseFloat(ultimoResultado) - parseFloat(numeroNuevo);
+            case '/':
+                return parseFloat(ultimoResultado) / parseFloat(numeroNuevo);
+            case 'x':
+                return parseFloat(ultimoResultado) * parseFloat(numeroNuevo);
+            case '%':
+                return (parseFloat(ultimoResultado) / 100) * parseFloat(numeroNuevo);
+        }
+    }
+
+    resetCalculator(){
+        this.setState({
+            operacion: '',
+            resultadoIntermedio: 0,
+            resultadoMostrar: 0,
+            ultimoOperador:'',
+            ultimoCaracter:'',
+            ultimoNumero:'',
+            operadores:[],
+            numeros:[]
+        })
+    }
+
+    resultadoFinal(){
+        this.setState({operacion:this.state.resultadoMostrar,resultadoMostrar:0})
+    }
+
+    addNumber(){
+        let numerosAux = this.state.numeros;
+        numerosAux.push(this.state.ultimoNumero);
+        this.setState({numeros:numerosAux,ultimoNumero:''});
+    }
+
+    addOperator(operator){
+        let operadoresAux = this.state.operadores;
+
+        if(operator==='()'){
+            let numOpen = operadoresAux.filter(oper=>oper==='(');
+            let numClos = operadoresAux.filter(clos=>clos===')');
+            console.log(numOpen+' '+numClos)
+            if(numOpen.length>numClos){
+                operator=')'
+            } else if(numOpen.length==numClos){
+                operator='('
+            }
+        }
+
+        operadoresAux.push(operator);
+        this.setState({operadores:operadoresAux,ultimoOperador:operator});
+    }
+
+    changeOperator(operator){
+        let operadoresAux = this.state.operadores;
+        operadoresAux.pop();
+        operadoresAux.push(operator);
+        this.setState({operadores:operadoresAux,ultimoOperador:operator});
+    }
+    
+    render(){
+        return (
+            <div className='calculadora'>
+                <div>
+                    <PantallaOperaciones operacion={this.state.operacion}></PantallaOperaciones>
+                    <PantallaResultado resultado={this.state.resultadoMostrar}></PantallaResultado>
+                </div>
+                <div>
+                    {this.renderButton('C')}
+                    {this.renderButton('DEL')}
+                    {this.renderButton('%',true)}
+                    {this.renderButton('÷',true)}
+                </div>
+                <div>
+                    {this.renderButton(7)}
+                    {this.renderButton(8)}
+                    {this.renderButton(9)}
+                    {this.renderButton('x',true)}
+                </div>
+                <div>
+                    {this.renderButton(4)}
+                    {this.renderButton(5)}
+                    {this.renderButton(6)}
+                    {this.renderButton('-',true)}
+                </div>
+                <div>
+                    {this.renderButton(1)}
+                    {this.renderButton(2)}
+                    {this.renderButton(3)}
+                    {this.renderButton('+',true)}
+                </div>
+                <div>
+                    {this.renderButton('.')}
+                    {this.renderButton(0)}
+                    {this.renderButton('()')}
+                    {this.renderButton('=',true)}
+                </div>
+            </div>
+        )
+    }
+}
+
+ReactDOM.render(
+    <Calculadora />,
+    document.getElementById('root')
+);
