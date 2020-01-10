@@ -11,6 +11,7 @@
     color: white;
     font-weight: 400;
     font-size: 1.3em;
+    -webkit-transition: all 0.6s ease;
 }
 
 .pantallaOperaciones, .pantallaResultado
@@ -37,9 +38,46 @@ body {
 }
 
 .equals{
+    width: 20vw;
     background-color: rgb(248, 147, 45);
 }
 
 .operator:not(.equals){
     color: #FFA242 !important
+}
+
+#C {
+    width: 20vw !important;
+}
+
+.espacioHistorico, .historicoContenedor {
+    width: 40vw;
+    height: 4vw;
+}
+
+.historico{
+    background-color: indianred;
+    position: fixed;
+    top: 16vw;
+    width: 40vw;
+    height: 4vw;
+    -webkit-transition: all 0.6s ease;
+    z-index: 10;
+    margin-top:8px;
+    font-size: 0;
+}
+
+.historico:hover{
+    height: 54vw;
+    font-size: 1.3em;
+}
+
+.pantallas {
+    position: relative;
+    z-index: 20;
+}
+
+.teclado { 
+    position: relative;
+    z-index: 5;
 }

@@ -17,6 +17,18 @@ function Tecla (props) {
         return <button type='button' onClick={props.onClick} id={props.id} className={'button '+props.tipo}>{props.id}</button>
 }
 
+function Historico (props) {
+
+    let historico = props.operaciones.map((element,index) => {
+        return <p>
+            {element + ' = ' +props.resultados[index]}
+        </p>
+    });
+
+    return <div className={'historico'}>{historico}</div>
+}
+
+
 class Calculadora extends React.Component {
     
     constructor(props){
@@ -25,6 +37,8 @@ class Calculadora extends React.Component {
             operacion: '',
             resultadoMostrar: 0,
             resultadoIntermedio: 0,
+            historicoResultados: [],
+            historicoOperacion: [],
             ultimoOperador:'',
             ultimoCaracter:'',
             ultimoNumero:'',
@@ -102,8 +116,8 @@ class Calculadora extends React.Component {
     }
 
     isOperator(char){
-        return (char==='+' || char==='-' || char==='/' || char==='x' || char==='=' || char==='%' 
-                || char === '()')
+        return (char==='+' || char==='-' || char==='/' || char==='x' || char==='=' 
+                || char==='%' || char==='DEL')
     }
 
     doOperation(ultimoResultado,numeroNuevo,operador){
@@ -132,12 +146,25 @@ class Calculadora extends React.Component {
             ultimoCaracter:'',
             ultimoNumero:'',
             operadores:[],
-            numeros:[]
+            numeros:[],
+            historicoOperacion:[],
+            historicoResultados:[]
         })
     }
 
     resultadoFinal(){
-        this.setState({operacion:this.state.resultadoMostrar,resultadoMostrar:0})
+        let historicoOperacionAux = this.state.historicoOperacion;
+        historicoOperacionAux.push(this.state.operacion);
+
+        let historicoResultadosAux = this.state.historicoResultados;
+        historicoResultadosAux.push(this.state.resultadoMostrar);
+
+        this.setState({
+            historicoOperacion: historicoOperacionAux,
+            historicoResultados: historicoResultadosAux,
+            operacion:this.state.resultadoMostrar,
+            resultadoMostrar:0
+            })
     }
 
     addNumber(){
@@ -148,18 +175,6 @@ class Calculadora extends React.Component {
 
     addOperator(operator){
         let operadoresAux = this.state.operadores;
-
-        if(operator==='()'){
-            let numOpen = operadoresAux.filter(oper=>oper==='(');
-            let numClos = operadoresAux.filter(clos=>clos===')');
-            console.log(numOpen+' '+numClos)
-            if(numOpen.length>numClos){
-                operator=')'
-            } else if(numOpen.length==numClos){
-                operator='('
-            }
-        }
-
         operadoresAux.push(operator);
         this.setState({operadores:operadoresAux,ultimoOperador:operator});
     }
@@ -174,39 +189,44 @@ class Calculadora extends React.Component {
     render(){
         return (
             <div className='calculadora'>
-                <div>
+                <div className='pantallas'>
                     <PantallaOperaciones operacion={this.state.operacion}></PantallaOperaciones>
                     <PantallaResultado resultado={this.state.resultadoMostrar}></PantallaResultado>
                 </div>
-                <div>
-                    {this.renderButton('C')}
-                    {this.renderButton('DEL')}
-                    {this.renderButton('%',true)}
-                    {this.renderButton('÷',true)}
+                <div className='historicoContenedor'>
+                    <Historico operaciones={this.state.historicoOperacion} 
+                            resultados={this.state.historicoResultados}></Historico>
+                    <div className='espacioHistorico'></div>
                 </div>
-                <div>
-                    {this.renderButton(7)}
-                    {this.renderButton(8)}
-                    {this.renderButton(9)}
-                    {this.renderButton('x',true)}
-                </div>
-                <div>
-                    {this.renderButton(4)}
-                    {this.renderButton(5)}
-                    {this.renderButton(6)}
-                    {this.renderButton('-',true)}
-                </div>
-                <div>
-                    {this.renderButton(1)}
-                    {this.renderButton(2)}
-                    {this.renderButton(3)}
-                    {this.renderButton('+',true)}
-                </div>
-                <div>
-                    {this.renderButton('.')}
-                    {this.renderButton(0)}
-                    {this.renderButton('()')}
-                    {this.renderButton('=',true)}
+                <div className='teclado'>
+                    <div className='fila'>
+                        {this.renderButton('C')}
+                        {this.renderButton('%',true)}
+                        {this.renderButton('÷',true)}
+                    </div>
+                    <div className='fila'>
+                        {this.renderButton(7)}
+                        {this.renderButton(8)}
+                        {this.renderButton(9)}
+                        {this.renderButton('x',true)}
+                    </div>
+                    <div className='fila'>
+                        {this.renderButton(4)}
+                        {this.renderButton(5)}
+                        {this.renderButton(6)}
+                        {this.renderButton('-',true)}
+                    </div>
+                    <div className='fila'>
+                        {this.renderButton(1)}
+                        {this.renderButton(2)}
+                        {this.renderButton(3)}
+                        {this.renderButton('+',true)}
+                    </div>
+                    <div className='fila'>
+                        {this.renderButton('.')}
+                        {this.renderButton(0)}
+                        {this.renderButton('=',true)}
+                    </div>
                 </div>
             </div>
         )
