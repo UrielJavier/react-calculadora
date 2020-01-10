@@ -2,6 +2,19 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
 }
 
+#root{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.calculadora {
+    width: 40vw;
+    box-shadow: 0 0 20px 0px black;
+    max-width: 400px;
+}
+
 .button {
     width: 10vw;
     max-width: 100px;
@@ -28,12 +41,6 @@
     font-size: 1.3em;
     text-align: right;
     margin: 0;
-}
-
-.calculadora {
-    width: 40vw;
-    box-shadow: 0 0 7px 0 gray;
-    max-width: 400px;
 }
 
 body {
@@ -67,7 +74,7 @@ body {
 
 .historico{
     background-color: indianred;
-    position: fixed;
+    position: relative;
     width: 40vw;
     max-width: 400px;
     height: 1.5vw;
@@ -75,6 +82,7 @@ body {
     -webkit-transition: all 0.6s ease;
     z-index: 10;
     font-size: 0;
+    overflow: scroll
 }
 
 .historico:hover{
