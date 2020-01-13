@@ -4,12 +4,12 @@ import './index.css';
 
 class PantallaOperaciones extends React.Component {
     render(){
-        return <p className='pantallaOperaciones'>{this.props.operacion}</p>
+        return <div className={'pantallaOperaciones'+(this.props.resultado!=0 ? ' show' : '')}>{this.props.operacion}</div>
     }
 }
 class PantallaResultado extends React.Component {
     render(){
-        return <p className='pantallaResultado'>{this.props.resultado}</p>
+        return <div className='pantallaResultado'>{this.props.resultado}</div>
     }
 }
 
@@ -20,9 +20,9 @@ function Tecla (props) {
 function Historico (props) {
 
     let historico = props.operaciones.map((element,index) => {
-        return <p>
+        return <div id={'historico_'+index}className='elementoHistorial' onClick={(index) => props.goBack(index)}>
             {element + ' = ' +props.resultados[index]}
-        </p>
+        </div>
     });
 
     return <div className={'historico'}>{historico}</div>
@@ -185,17 +185,31 @@ class Calculadora extends React.Component {
         operadoresAux.push(operator);
         this.setState({operadores:operadoresAux,ultimoOperador:operator});
     }
+
+    goBack(event){
+        let index = event.target.id.substring(10);
+        console.log(index)
+        if(index>-1){
+            this.setState({
+                historicoOperacion: this.state.historicoOperacion.filter((x,i) => i<= index),
+                historicoResultados: this.state.historicoResultados.filter((x,i) => i<= index),
+                operacion: this.state.historicoOperacion[index],
+                resultadoMostrar: this.state.historicoResultados[index]
+            });
+        }
+    }
     
     render(){
         return (
             <div className='calculadora'>
                 <div className='pantallas'>
-                    <PantallaOperaciones operacion={this.state.operacion}></PantallaOperaciones>
+                    <PantallaOperaciones operacion={this.state.operacion} resultado={this.state.resultadoMostrar}></PantallaOperaciones>
                     <PantallaResultado resultado={this.state.resultadoMostrar}></PantallaResultado>
                 </div>
                 <div className='historicoContenedor'>
                     <Historico operaciones={this.state.historicoOperacion} 
-                            resultados={this.state.historicoResultados}></Historico>
+                            resultados={this.state.historicoResultados}
+                            goBack={this.goBack.bind(this)}></Historico>
                     <div className='espacioHistorico'></div>
                 </div>
                 <div className='teclado'>
