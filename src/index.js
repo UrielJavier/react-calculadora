@@ -2,20 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class PantallaOperaciones extends React.Component {
-    render(){
-        return <div className={'pantallaOperaciones'+(this.props.resultado!=0 ? ' show' : '')}>{this.props.operacion}</div>
-    }
-}
-class PantallaResultado extends React.Component {
-    render(){
-        return <div className='pantallaResultado'>{this.props.resultado}</div>
-    }
-}
+const PantallaOperaciones = ({resultado,operacion}) =>
+        (<div className={'pantallaOperaciones'+(resultado!=0 ? ' show' : '')}>
+            {operacion}
+        </div>)
 
-function Tecla (props) {
-        return <button type='button' onClick={props.onClick} id={props.id} className={'button '+props.tipo}>{props.id}</button>
-}
+const PantallaResultado = ({resultado}) =>
+        (<div className='pantallaResultado'>
+            {resultado}
+        </div>)
+
+const Tecla = ({onClick,tipo,id}) =>    
+        (<button type='button' onClick={onClick} 
+            id={id} className={'button '+tipo}>
+                {id}
+        </button>)
+
 
 function Historico (props) {
 
@@ -48,7 +50,7 @@ class Calculadora extends React.Component {
     }
 
     renderButton(i,operator){
-        let tipo = (operator !== undefined && operator === true) ? 'operator' : 'number';
+        let tipo = (operator === true) ? 'operator' : 'number';
         if(i==='='){
             tipo = tipo.concat(' equals');
         }else if(i==='÷'){
@@ -94,22 +96,16 @@ class Calculadora extends React.Component {
 
         // Si se introduce un numero
         }else if(!this.isOperator(i)){
-            console.log('se introduce parte de un numero')
             let ultimoNumeroAux = this.state.ultimoNumero+i
-            this.setState({operacion:this.state.operacion+i});
-            this.setState({ultimoNumero: ultimoNumeroAux})
+            this.setState({operacion:this.state.operacion+i,
+                            ultimoNumero: ultimoNumeroAux})
 
             // Si se introducuce un numero despues de un operador (salvo el -)
             if(this.state.numeros.length>0 && this.state.operadores.length>0 && !this.isOperator(i) && i!=='.'){
                 let res = this.doOperation(this.state.resultadoIntermedio,ultimoNumeroAux,this.state.operadores[this.state.operadores.length-1])
-                console.log(res)
-                this.setState({ultimoResultado:res})
-                this.setState({resultadoMostrar:res})
+                this.setState({ultimoResultado:res,
+                            resultadoMostrar:res})
             }
-        }
-        
-        if(this.state.numeros.length===1 && this.state.resultadoIntermedio===0){
-            this.setState({resultadoIntermedio:this.state.numeros[0]})
         }
         
         this.setState({ultimoCaracter:i})
@@ -153,11 +149,8 @@ class Calculadora extends React.Component {
     }
 
     resultadoFinal(){
-        let historicoOperacionAux = this.state.historicoOperacion;
-        historicoOperacionAux.push(this.state.operacion);
-
-        let historicoResultadosAux = this.state.historicoResultados;
-        historicoResultadosAux.push(this.state.resultadoMostrar);
+        let historicoOperacionAux = this.state.historicoOperacion.concat(this.state.operacion);
+        let historicoResultadosAux = this.state.historicoResultados.concat(this.state.resultadoMostrar);
 
         this.setState({
             historicoOperacion: historicoOperacionAux,
@@ -168,21 +161,25 @@ class Calculadora extends React.Component {
     }
 
     addNumber(){
-        let numerosAux = this.state.numeros;
-        numerosAux.push(this.state.ultimoNumero);
+        let numerosAux = this.state.numeros.concat(this.state.ultimoNumero);
+        
+        console.log(this.state.numeros.length===1)
+        if(numerosAux.length===1 && this.state.resultadoIntermedio===0){
+            this.setState({resultadoIntermedio:numerosAux[0]})
+        }
+        
         this.setState({numeros:numerosAux,ultimoNumero:''});
     }
 
     addOperator(operator){
-        let operadoresAux = this.state.operadores;
-        operadoresAux.push(operator);
+        let operadoresAux = this.state.operadores.concat(operator);
         this.setState({operadores:operadoresAux,ultimoOperador:operator});
     }
 
     changeOperator(operator){
         let operadoresAux = this.state.operadores;
-        operadoresAux.pop();
-        operadoresAux.push(operator);
+        operadoresAux.slice(0,-1);
+        operadoresAux.concat(operator);
         this.setState({operadores:operadoresAux,ultimoOperador:operator});
     }
 
